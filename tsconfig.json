@@ -1,0 +1,33 @@
+{
+    "compilerOptions": {
+      "alwaysStrict": true,
+      "baseUrl": ".",
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "lib": [ "ES2022" ],
+      "module": "CommonJS",
+      "moduleResolution": "Node",
+      "noEmitOnError": true,
+      "noImplicitAny": true,
+      "outDir": "./dist",
+      "paths": {
+        "*": [
+          "node_modules/*",
+          "src/types/*"
+        ]
+      },
+      "removeComments": true,
+      "skipLibCheck": true,
+      "sourceMap": true,
+      "target": "ES2022"
+    },
+    "exclude": [
+      "node_modules",
+      "./dist",
+      "./.vite.config.ts"
+    ],
+    "include": [
+      "./src/**/*",
+      "./test/**/*"
+    ]
+  }

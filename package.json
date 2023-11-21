@@ -1,0 +1,38 @@
+{
+  "name": "athena-agent",
+  "version": "0.1",
+  "description": "TypeScript port of CosmosShadow/GeneralAgent",
+  "main": "dist/index.js",
+  "author": "beau",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@roarr/cli": "^5.12.4",
+    "@types/needle": "^3.2.3",
+    "@types/node": "^20.9.1",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "eslint": "^8.53.0",
+    "eslint-plugin-deprecation": "^2.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.0.3",
+    "prettier-eslint": "^16.1.2",
+    "typescript": "^5.2.2",
+    "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^v1.0.0-beta.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "needle": "^3.2.0",
+    "rambda": "^8.5.0",
+    "roarr": "^7.21.0"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "start": "set ROARR_LOG=true && node dist/index.js | roarr pretty-print",
+    "lint": "eslint . --ext .ts",
+    "test": "vitest | roarr pretty-print"
+  }
+}
