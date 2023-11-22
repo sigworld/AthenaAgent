@@ -12,6 +12,7 @@
     "@types/node": "^20.9.1",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
+    "@vitest/coverage-istanbul": "^1.0.0-beta.5",
     "axios": "^1.6.2",
     "cheerio": "^1.0.0-rc.12",
     "eslint": "^8.53.0",
@@ -33,6 +34,7 @@
     "build": "tsc --project tsconfig.build.json",
     "start": "node dist/index.js | roarr pretty-print",
     "lint": "eslint . --ext .ts",
-    "test": "vitest | roarr pretty-print"
+    "test": "vitest | roarr pretty-print",
+    "coverage": "vitest run --coverage"
   }
 }

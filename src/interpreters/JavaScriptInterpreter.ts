@@ -13,9 +13,9 @@ const JAVASCRIPT_SYS_TEMPLATE = `
 # Run JavaScript
 * format: \`\`\`js\n{code}\`\`\`
 * {code} should be encapsulated within an IIFE function.
-* The result of the IIFE should be directly returned, not logged to the console. This is crucial for capturing the output in a Node.js VM environment.
+* The result of the IIFE should be directly returned, **NOT logged to the 'console'**. This is crucial for capturing the output in a Node.js VM environment.
 * **Use async/await syntax for handling asynchronous functions or Promises. Avoid using .then() chaining.**
-* **Deliver fully runnable code, with complete feature implementation.**
+* **Problem is only Solved with: 1) fully runnable code; 2) complete feature implementation.**
 * JavaScript runtime environment: ES2022, module mode not supported.
 ${JS_MODULE_MARKER}
 ${JS_FUNC_MARKER}

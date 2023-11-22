@@ -11,6 +11,7 @@ export default class NormalAgent extends DumbAgent {
     super(model);
     this.memory = new CacheMemory();
     this.provideIntepreters(...interpreters);
+    // this.shouldHideInternalInference = false;
   }
 
   static default() {}
