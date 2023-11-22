@@ -21,7 +21,7 @@ export async function* fetchLLMCompletion(
     {
       messages: prompt,
       stream,
-      top_p: 0.1
+      top_p: 0.7
     },
     {
       json: true,
