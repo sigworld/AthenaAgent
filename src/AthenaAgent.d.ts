@@ -14,8 +14,9 @@ interface Interpreter {
 
 interface SkillFunction<T> {
   (...args: unknown[]): T | Promise<T>;
-  description: string!;
-  deps: string[]!;
+  deps?: string[];
+  callable?: boolean;
+  description?: string;
 }
 
 interface TokenAggregator {

@@ -1,9 +1,9 @@
-import { fetchLLMCompletion } from "./LLMInference";
-import { cutMessages } from "./LLMTokenCounter";
-import { scrapeWeb } from "./WebSearch";
+import * as LLMInferenceSkill from "./LLMInference";
+import * as LLMTokenCounterSkill from "./LLMTokenCounter";
+import * as WebSearchSkill from "./WebSearch";
 
 export default {
-  cutMessages,
-  fetchLLMCompletion,
-  scrapeWeb
+  ...LLMInferenceSkill,
+  ...LLMTokenCounterSkill,
+  ...WebSearchSkill
 };
