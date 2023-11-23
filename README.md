@@ -1,4 +1,4 @@
-## Crafting LLM User-Customizable, Evolvable AI Agents</h1>
+## Crafting LLM with User-Customizable, Evolvable AI Agents</h1>
 
 **AthenaAgent** is a TypeScript port of **[GeneralAgent](https://github.com/CosmosShadow/GeneralAgent)** by *[CosmosShadow](https://github.com/CosmosShadow)*, which aims to build an intuitive framework designed for dynamic adaptation. Unlike others, GeneralAgent specializes in equipping users with intelligent agents that are:
 
