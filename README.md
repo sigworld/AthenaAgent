@@ -54,4 +54,5 @@ GPT3_5_APIKEY={api-key}
 
 # GPT3.5-Turbo-Instruct (for LLM Completion inference), latest Azure api-version: 2023-09-01-preview
 GPT3_5_I_APIKEY={api-key}
+GPT3_5_I_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/completions?api-version={api-version}
 ```
