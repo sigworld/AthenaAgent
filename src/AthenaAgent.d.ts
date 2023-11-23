@@ -7,21 +7,22 @@ interface Interpreter {
   inputMatches(input: string): boolean;
   outputMatches(output: string): boolean;
   outputStartMatches(output: string): [matches: boolean, matchedStr: string];
-  outputEndMatches(output: string): [matches: boolean, matchedStr: string];
-  parseInput(input: string): [parsedInput: string, shouldStop: boolean];
-  parseOutput(output: string): Promise<[parsedOutput: string, shouldStop: boolean]>;
+  extractOutputMatchTrailing(output: string): string;
+  parseInput(input: string): string;
+  parseOutput(output: string): Promise<string>;
 }
 
 interface SkillFunction<T> {
   (...args: unknown[]): T | Promise<T>;
-  description: string!;
-  deps: string[]!;
+  deps?: string[];
+  callable?: boolean;
+  description?: string;
 }
 
 interface TokenAggregator {
   more(res: unknown): void;
   get(): unknown;
-  getAll(): unknown[];
+  tokenArray(): unknown[];
 }
 
 type LLMInferenceConfig = {

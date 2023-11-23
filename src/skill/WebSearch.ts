@@ -23,9 +23,11 @@ export const scrapeWeb: SkillFunction<{
     return;
   }
 };
-
 scrapeWeb.description = `
 scrapeWeb: (url: string) => Promise<{title: string, content: string, imageUrls: string[], hyperlinks: string[]}> // Scrape web page of the given url, return '{title, content, imageUrls, hyperlinks}' on success, otherwise return '{}'.
 `;
+scrapeWeb.callable = true;
 
-scrapeWeb.deps = ["axios", "cheerio"];
+export const scrapingBuildTools: SkillFunction<void> = () => {};
+scrapingBuildTools.callable = false;
+scrapingBuildTools.deps = ["axios", "cheerio"];

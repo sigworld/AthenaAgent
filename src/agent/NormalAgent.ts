@@ -1,7 +1,11 @@
 import CacheMemory from "../memory/CacheMemory";
 import SkillSet from "../skill/SkillSet";
 import { logOf } from "../util/logger";
-import { isNilEmpty, pickFirstCompletionStreamChoice } from "../util/puref";
+import {
+  isNilEmpty,
+  pickFirstCompletionChoice,
+  pickFirstCompletionStreamChoice
+} from "../util/puref";
 import DumbAgent from "./DumbAgent";
 
 const logger = logOf("NormalAgent");
@@ -15,42 +19,66 @@ export default class NormalAgent extends DumbAgent {
 
   static default() {}
 
+  noStream(): NormalAgent {
+    this.streamResponse = false;
+    return this;
+  }
+
+  showInternalInference(): NormalAgent {
+    this.shouldHideInternalInference = false;
+    return this;
+  }
+
   async run(userInput: string, outputAggregator: TokenAggregator): Promise<void> {
     this.setRunning();
 
-    let shouldStop = await this._parseInput(userInput, outputAggregator);
+    const shouldStop = await this._parseInput(userInput, outputAggregator);
     if (shouldStop) {
       this.stopRunning();
       return;
     }
 
+    let interpretionCount = 0;
     while (this.isRunning()) {
       const messages = this._getLLMMessages();
 
-      shouldStop = await this._parseOutput(messages, outputAggregator);
-      if (shouldStop) break;
+      const anyInterpreterParsed = this.streamResponse
+        ? await this._parseStreamOutput(messages, outputAggregator)
+        : await this._parseOutput(messages, outputAggregator);
+      if (anyInterpreterParsed) {
+        interpretionCount++;
+      } else {
+        if (interpretionCount > 0) {
+          this.stopRunning();
+        }
+      }
     }
-    this.stopRunning();
-  }
 
-  private async _parseOutput(
+    logger.trace(
+      "conversation:\n%s",
+      this.memory
+        .getAllMessage()
+        .map((cm) => `${cm.role}: ${cm.content}`)
+        .join("\n")
+    );
+  }
+  private async _parseStreamOutput(
     messages: ConversationMessage[],
     outputAggregator: TokenAggregator
-  ): Promise<boolean> {
+  ) {
     let result = "";
 
     let parsingInterpreter: Interpreter;
-    let isInterpreterParsing = false;
+    let interpreterParsingStage = 0;
     const cachedTokens: string[] = [];
     for await (const deltaResponse of SkillSet.fetchLLMCompletion(this.model, messages, true)) {
       const token = pickFirstCompletionStreamChoice(deltaResponse) as string;
-      if (isNilEmpty(token)) continue; // for azure openai, first streamed message is role: assistant
+      if (isNilEmpty(token)) continue; // for azure openai api, first streamed message is role: assistant
 
       result += token;
-      cachedTokens.push(token);
       if (this.shouldHideInternalInference) {
         // find match interpreters to handle the tokens
-        if (!isInterpreterParsing) {
+        if (interpreterParsingStage === 0) {
           let tokenLengthToDeductFromCache = 0;
           const intprtIndex = this.interpreters.findIndex((intprt) => {
             // match an interpreter to start parsing
@@ -62,7 +90,8 @@ export default class NormalAgent extends DumbAgent {
             return false;
           });
           if (intprtIndex > -1) {
-            isInterpreterParsing = true;
+            interpreterParsingStage++;
+            cachedTokens.push(token);
             parsingInterpreter = this.interpreters[intprtIndex];
 
             while (tokenLengthToDeductFromCache > 0) {
@@ -76,41 +105,95 @@ export default class NormalAgent extends DumbAgent {
             }
           }
 
-          // if (!isInterpreterParsing) {
-          if (cachedTokens.length > 5) {
-            // when cached tokens are more than 5  TODO: but why?
-            outputAggregator.more(cachedTokens.shift());
+          if (interpreterParsingStage === 0) {
+            cachedTokens.push(token);
+            if (cachedTokens.length > 5) {
+              // when cached tokens are more than 5  TODO: but why?
+              outputAggregator.more(cachedTokens.shift());
+            }
           }
-          // }
         }
       } else {
         outputAggregator.more(token);
       }
 
-      // const interpreter = parsingInterpreter; // && parsingInterpreter.outputMatches(result);
-      // this.interpreters.find((intprt) => intprt.outputMatches(result));
-      if (parsingInterpreter && parsingInterpreter.outputMatches(result)) {
-        const [parsedOutput, shouldStopInterpreting] =
-          await parsingInterpreter.parseOutput(result);
+      const matchedInterpreter =
+        parsingInterpreter && parsingInterpreter.outputMatches(result)
+          ? parsingInterpreter
+          : this.interpreters.find((intprt) => intprt.outputMatches(result));
+      if (matchedInterpreter) {
+        // assume one effective interpreter for a message
+        interpreterParsingStage++;
+        const parsedOutput = await matchedInterpreter.parseOutput(result);
         if (this.shouldHideInternalInference) {
-          const [suffixMatches, matchedStr] = parsingInterpreter.outputEndMatches(result);
-          if (suffixMatches) outputAggregator.more(matchedStr);
-        }
-        if (!this.shouldHideInternalInference || shouldStopInterpreting) {
+          const matchTrailing = matchedInterpreter.extractOutputMatchTrailing(result);
+          outputAggregator.more(matchTrailing);
+        } else {
           outputAggregator.more(parsedOutput);
         }
-        result += "\n" + parsedOutput + "\n";
-        if (shouldStopInterpreting) {
-          this.memory.appendMessage("assistant", result);
-          return true;
-        }
+
+        result += parsedOutput;
+
+        // already got what we want, dump the rest tokens
+        break;
       }
     }
 
-    // TODO: clear cached tokens
-    logger.debug("are there cached tokens left? %s", cachedTokens.length);
+    while (cachedTokens.length > 0) {
+      // clear cached tokens
+      outputAggregator.more(cachedTokens.shift());
+    }
+
     this.memory.appendMessage("assistant", result);
-    return false;
+    return interpreterParsingStage > 0;
+  }
+
+  private async _parseOutput(
+    messages: ConversationMessage[],
+    outputAggregator: TokenAggregator
+  ): Promise<boolean> {
+    let result = "";
+
+    let interpreterParsingStage = 0;
+    for await (const deltaResponse of SkillSet.fetchLLMCompletion(
+      this.model,
+      messages,
+      false
+    )) {
+      result = pickFirstCompletionChoice(deltaResponse) as string;
+      if (isNilEmpty(result)) {
+        logger.warn("something's wrong, api responded nothing!");
+        return interpreterParsingStage > 0;
+      }
+
+      if (!this.shouldHideInternalInference) {
+        outputAggregator.more(result);
+      }
+
+      const matchedInterpreter = this.interpreters.find((intprt) =>
+        intprt.outputMatches(result)
+      );
+      if (matchedInterpreter) {
+        // assume one effective interpreter for a message
+        interpreterParsingStage++;
+        const parsedOutput = await matchedInterpreter.parseOutput(result);
+        if (this.shouldHideInternalInference) {
+          const matchTrailing = matchedInterpreter.extractOutputMatchTrailing(result);
+          outputAggregator.more(matchTrailing);
+        } else {
+          outputAggregator.more(parsedOutput);
+        }
+
+        result += parsedOutput;
+        break;
+      }
+    }
+    if (interpreterParsingStage === 0 && this.shouldHideInternalInference) {
+      outputAggregator.more(result);
+    }
+
+    this.memory.appendMessage("assistant", result);
+    return interpreterParsingStage > 0;
   }
 
   private _getLLMMessages() {
@@ -118,7 +201,7 @@ export default class NormalAgent extends DumbAgent {
     const messages = SkillSet.cutMessages(allMessages, 3000);
     const systemPrompt = this.interpreters
       .map((interpreter) => interpreter.sysPrompt())
-      .join("\n\n");
+      .join("\n");
     messages.unshift({ role: "system", content: systemPrompt });
     return messages;
   }

@@ -7,16 +7,16 @@ Refer to [GeneralAgent README](https://github.com/CosmosShadow/GeneralAgent/blob
 ## Features (Specific to AthenaAgent)
 
 * Simple, fast, stable: compatible with Azure OpenAI models: GPT3.5-turbo, GPT4, GPT4-turbo
-* Build-in interpreters: JavaScript
-
+* Build-in interpreters: JavaScript(built-in vm context)
 
 ### Coming Soon
 
-- Interpreters: File, Plan, Shell, AppleScript, Retrieve Embedding, etc.
+- `functions` and `json_mode` support for more stable and consistent response
+- Interpreters: File, Shell, AppleScript, Retrieve Embedding, etc.
+- Skill Set: txt-to-img(DALLE-3), txt-to-voice
 - Memory: File Memory, Compressed Memory, Link Memory, etc.
-- Command Line Interface
-- Dynamic UI: cross-platform UI
-- Web UI
+- UI: Command Line Interface, Dynamic UI (a cross-platform native UI), Web UI
+
 
 ## Status 👨‍💻
 

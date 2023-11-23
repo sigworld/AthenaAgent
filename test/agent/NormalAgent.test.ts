@@ -10,8 +10,8 @@ const resultAggregator = (): TokenAggregator => {
     more: (res: unknown) => {
       result.push(res);
     },
-    getAll: () => result,
-    get: () => result.at(-1)
+    tokenArray: () => result,
+    get: () => result.join("")
   };
 };
 
@@ -23,13 +23,32 @@ async function runWebScrapingAgent(model: LLMType) {
   );
   const result = resultAggregator();
   await agent.run("What's the title of web page https://www.example.com", result);
-  return result.getAll().at(-1);
+  return result.get();
 }
 
 test("GPT4 WebScraping", async () => {
-  await expect(runWebScrapingAgent("GPT4")).resolves.toBe("Example Domain");
+  await expect(runWebScrapingAgent("GPT4")).resolves.toContain("Example Domain");
 });
 
 test("GPT3.5 WebScraping", async () => {
-  await expect(runWebScrapingAgent("GPT3_5")).resolves.toBe("Example Domain");
+  await expect(runWebScrapingAgent("GPT3_5")).resolves.toContain("Example Domain");
+});
+
+async function buildAndRunWebScrapingAgent(model: LLMType) {
+  const agent = new NormalAgent(
+    model,
+    new BaseInterpreter(),
+    new JavaScriptInterpreter().provideFunctionTool(SkillSet.scrapingBuildTools)
+  );
+  const result = resultAggregator();
+  await agent.run("What's the title of web page https://www.example.com", result);
+  return result.get();
+}
+
+test("GPT3.5 Build and Run WebScraping", async () => {
+  await expect(buildAndRunWebScrapingAgent("GPT3_5")).resolves.toContain("Example Domain");
+});
+
+test("GPT4 Build and Run WebScraping", async () => {
+  await expect(buildAndRunWebScrapingAgent("GPT4")).resolves.toContain("Example Domain");
 });

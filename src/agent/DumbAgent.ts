@@ -5,6 +5,7 @@ export default abstract class DumbAgent {
   protected memory: CacheMemory;
   protected interpreters: Interpreter[];
   protected shouldHideInternalInference = true;
+  protected streamResponse = true;
   protected model: LLMType = "GPT3_5";
 
   constructor(model: LLMType) {
