@@ -54,3 +54,7 @@ test.runIf(isDev)("GPT3.5 Build and Run WebScraping", async () => {
 test.runIf(isDev)("GPT4 Build and Run WebScraping", async () => {
   await expect(buildAndRunWebScrapingAgent("GPT4")).resolves.toContain("Example Domain");
 });
+
+test.runIf(isDev)("GPT4-Turbo Build and Run WebScraping", async () => {
+  await expect(buildAndRunWebScrapingAgent("GPT4_T")).resolves.toContain("Example Domain");
+});

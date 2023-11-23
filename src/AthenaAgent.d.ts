@@ -3,7 +3,7 @@ type AnyFunction =
   | ((...args: unknown[]) => Promise<unknown>);
 
 interface Interpreter {
-  sysPrompt(): string;
+  sysPrompt(customPrompt?: string): string;
   inputMatches(input: string): boolean;
   outputMatches(output: string): boolean;
   outputStartMatches(output: string): [matches: boolean, matchedStr: string];
@@ -30,7 +30,7 @@ type LLMInferenceConfig = {
   requireJson?: boolean;
 };
 
-type LLMType = "GPT3_5" | "GPT4";
+type LLMType = "GPT3_5" | "GPT4" | "GPT4_T";
 
 type LLMInstructType = "GPT3_5_I"; // GPT3.5-Instruct
 

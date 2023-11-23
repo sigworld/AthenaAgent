@@ -103,6 +103,7 @@ export async function* fetchLLMChatCompletion(
   const DONE_MARKER = "[DONE]";
   const NORMAL_FINISH_MARKER = "stop";
   let partialData = "";
+  // assuming all requests will succeed
   for await (const chunk of request) {
     /* non-stream mode waits for only one complete chunk */
     if (!stream) {
