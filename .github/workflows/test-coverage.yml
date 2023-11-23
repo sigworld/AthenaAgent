@@ -11,6 +11,8 @@ jobs:
       GPT3_5_URL: ${{ secrets.GPT3_5_URL }}
       GPT4_APIKEY: ${{ secrets.GPT4_APIKEY }}
       GPT4_URL: ${{ secrets.GPT4_URL }}
+      GPT3_5_I_APIKEY: ${{ secrets.GPT3_5_I_APIKEY }}
+      GPT3_5_I_URL: ${{ secrets.GPT3_5_I_URL }}
       ROARR_LOG: true
       NODE_ENV: development
     
