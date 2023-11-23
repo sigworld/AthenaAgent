@@ -1,14 +1,20 @@
+## Crafting LLM User-Customizable, Evolvable AI Agents</h1>
 
-**AthenaAgent** is a TypeScript port of **[GeneralAgent](https://github.com/CosmosShadow/GeneralAgent)** by *[CosmosShadow](https://github.com/CosmosShadow)*.
+**AthenaAgent** is a TypeScript port of **[GeneralAgent](https://github.com/CosmosShadow/GeneralAgent)** by *[CosmosShadow](https://github.com/CosmosShadow)*, which aims to build an intuitive framework designed for dynamic adaptation. Unlike others, GeneralAgent specializes in equipping users with intelligent agents that are:
+
+- capable of self-evolving through interpretable skills;
+- with customizable and dynamic interfaces.
+
+It's more than a tool, it's a companion that grows with users' needs, making AI's advanced capabilities accessible and operational for everyone. 
+
+Refer to [GeneralAgent/README](https://github.com/CosmosShadow/GeneralAgent/blob/main/README.md) for more details about the agent framework.
 
 <img src="https://img.shields.io/static/v1?label=license&message=MIT&color=white&style=flat" alt="License"/> [![Test Coverage](https://github.com/sigworld/AthenaAgent/actions/workflows/test-coverage.yml/badge.svg?branch=main)](https://github.com/sigworld/AthenaAgent/actions/workflows/test-coverage.yml)
-
-Refer to [GeneralAgent README](https://github.com/CosmosShadow/GeneralAgent/blob/main/README.md) for more details about the agent framework.
 
 
 ## Features
 
-* Simple, fast, stable: compatible with Azure OpenAI models: GPT3.5-turbo, GPT4, GPT4-turbo
+* Simple, fast, stable: support Azure OpenAI models: GPT3.5-turbo, GPT4, GPT4-turbo
 * Build-in interpreters: JavaScript(built-in vm context)
 
 ### Coming Soon
@@ -31,7 +37,7 @@ This project is now under active 🔥 development with daily updates.
 yarn install
 ```
 
-**The following environment variables are required for LLM infererence:**
+**The following environment variables are required for LLM inferrence:**
 
 ```
 # GPT4 (for LLM ChatCompletion inference), latest Azure api-version: 2023-12-01-preview
