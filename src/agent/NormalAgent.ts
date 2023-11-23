@@ -3,6 +3,7 @@ import SkillSet from "../skill/SkillSet";
 import { logOf } from "../util/logger";
 import {
   isNilEmpty,
+  notEmpty,
   pickFirstChatCompletionChoice,
   pickFirstChatCompletionStreamChoice
 } from "../util/puref";
@@ -67,6 +68,7 @@ export default class NormalAgent extends DumbAgent {
     outputAggregator: TokenAggregator
   ) {
     let result = "";
+    let parsedOutput = "";
 
     let parsingInterpreter: Interpreter;
     let interpreterParsingStage = 0;
@@ -126,17 +128,15 @@ export default class NormalAgent extends DumbAgent {
           ? parsingInterpreter
           : this.interpreters.find((intprt) => intprt.outputMatches(result));
       if (matchedInterpreter) {
-        // assume one effective interpreter for a message
+        // assuming only one effective interpreter for a message
         interpreterParsingStage++;
-        const parsedOutput = await matchedInterpreter.parseOutput(result);
+        parsedOutput = await matchedInterpreter.parseOutput(result);
         if (this.shouldHideInternalInference) {
           const matchTrailing = matchedInterpreter.extractOutputMatchTrailing(result);
           outputAggregator.more(matchTrailing);
         } else {
           outputAggregator.more(parsedOutput);
         }
-
-        result += parsedOutput;
 
         // already got what we want, dump the rest tokens
         break;
@@ -149,6 +149,9 @@ export default class NormalAgent extends DumbAgent {
     }
 
     this.memory.appendMessage("assistant", result);
+    if (notEmpty(parsedOutput)) {
+      this.memory.appendMessage("user", parsedOutput);
+    }
     return interpreterParsingStage > 0;
   }
 
@@ -159,8 +162,6 @@ export default class NormalAgent extends DumbAgent {
     let result = "";
 
     let interpreterParsingStage = 0;
-    // TODO: when messages include assistant message, next to do is use completion api
-    // SkillSet.fetchLLMCompletion(this.model);
     for await (const deltaResponse of SkillSet.fetchLLMChatCompletion(
       this.model,
       messages,

@@ -21,14 +21,14 @@ const conversation: ConversationMessage[] = [
   }
 ];
 
-test.runIf(isDev).skip("GPT3.5 repeater, no stream", async () => {
+test.runIf(isDev)("GPT3.5 repeater, no stream", async () => {
   const completion = SkillSet.fetchLLMChatCompletion("GPT3_5", conversation, false);
   let data = (await completion.next()).value;
   const response = pickFirstChatCompletionChoice(data);
   expect(response).toBe("I'm Good, SIR!");
 });
 
-test.runIf(isDev).skip("GPT4 repeater, no stream", async () => {
+test.runIf(isDev)("GPT4 repeater, no stream", async () => {
   const completion = SkillSet.fetchLLMChatCompletion("GPT4", conversation, false);
   let data = (await completion.next()).value;
   const response = pickFirstChatCompletionChoice(data);
@@ -65,7 +65,7 @@ test.runIf(isDev).skip("GPT4 repeater, stream", async () => {
   }
 });
 
-test.runIf(isDev).skip("GPT3.5-Instruct, no stream", async () => {
+test.runIf(isDev)("GPT3.5-Instruct, no stream", async () => {
   const completion = SkillSet.fetchLLMCompletion(
     "GPT3_5_I",
     `I said to a repeater: "Good". And the repeater exactly echoed:`,
