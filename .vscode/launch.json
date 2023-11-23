@@ -8,7 +8,8 @@
       "type": "node",
       "request": "launch",
       "env": {
-        "ROARR_LOG": "true"
+        "ROARR_LOG": "true",
+        "NODE_ENV": "development"
       },
       "name": "Debug Current Test File",
       "autoAttachChildProcesses": true,

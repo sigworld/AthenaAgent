@@ -3,8 +3,9 @@ import SkillSet from "../skill/SkillSet";
 import { logOf } from "../util/logger";
 import {
   isNilEmpty,
-  pickFirstCompletionChoice,
-  pickFirstCompletionStreamChoice
+  notEmpty,
+  pickFirstChatCompletionChoice,
+  pickFirstChatCompletionStreamChoice
 } from "../util/puref";
 import DumbAgent from "./DumbAgent";
 
@@ -67,12 +68,17 @@ export default class NormalAgent extends DumbAgent {
     outputAggregator: TokenAggregator
   ) {
     let result = "";
+    let parsedOutput = "";
 
     let parsingInterpreter: Interpreter;
     let interpreterParsingStage = 0;
     const cachedTokens: string[] = [];
-    for await (const deltaResponse of SkillSet.fetchLLMCompletion(this.model, messages, true)) {
-      const token = pickFirstCompletionStreamChoice(deltaResponse) as string;
+    for await (const deltaResponse of SkillSet.fetchLLMChatCompletion(
+      this.model,
+      messages,
+      true
+    )) {
+      const token = pickFirstChatCompletionStreamChoice(deltaResponse) as string;
       if (isNilEmpty(token)) continue; // for azure openai api, first streamed message is role: assistant
 
       result += token;
@@ -122,17 +128,15 @@ export default class NormalAgent extends DumbAgent {
           ? parsingInterpreter
           : this.interpreters.find((intprt) => intprt.outputMatches(result));
       if (matchedInterpreter) {
-        // assume one effective interpreter for a message
+        // assuming only one effective interpreter for a message
         interpreterParsingStage++;
-        const parsedOutput = await matchedInterpreter.parseOutput(result);
+        parsedOutput = await matchedInterpreter.parseOutput(result);
         if (this.shouldHideInternalInference) {
           const matchTrailing = matchedInterpreter.extractOutputMatchTrailing(result);
           outputAggregator.more(matchTrailing);
         } else {
           outputAggregator.more(parsedOutput);
         }
-
-        result += parsedOutput;
 
         // already got what we want, dump the rest tokens
         break;
@@ -145,6 +149,9 @@ export default class NormalAgent extends DumbAgent {
     }
 
     this.memory.appendMessage("assistant", result);
+    if (notEmpty(parsedOutput)) {
+      this.memory.appendMessage("user", parsedOutput);
+    }
     return interpreterParsingStage > 0;
   }
 
@@ -155,12 +162,12 @@ export default class NormalAgent extends DumbAgent {
     let result = "";
 
     let interpreterParsingStage = 0;
-    for await (const deltaResponse of SkillSet.fetchLLMCompletion(
+    for await (const deltaResponse of SkillSet.fetchLLMChatCompletion(
       this.model,
       messages,
       false
     )) {
-      result = pickFirstCompletionChoice(deltaResponse) as string;
+      result = pickFirstChatCompletionChoice(deltaResponse) as string;
       if (isNilEmpty(result)) {
         logger.warn("something's wrong, api responded nothing!");
         return interpreterParsingStage > 0;
