@@ -27,30 +27,41 @@ export default class JavaScriptInterpreter extends DumbInterpreter {
   outputMatchStartWithPattern = "```js\n";
   private functionTools: SkillFunction<unknown>[] = [];
 
-  sysPrompt(): string {
-    const jsFuncsStr = this.functionTools
-      .filter((tool) => tool.callable)
-      .map((tool) => tool.description)
-      .join("\n\n");
-    let prompt = JAVASCRIPT_SYS_TEMPLATE.replace(
-      JS_FUNC_MARKER,
-      isEmpty(jsFuncsStr)
-        ? ""
-        : `* The following functions are available in global context (already implemented):
+  sysPrompt(customPrompt?: string): string {
+    if (customPrompt || !this.interpreterPrompt) {
+      const thePrompt = customPrompt
+        ? `${customPrompt}\n${JS_MODULE_MARKER}\n${JS_FUNC_MARKER}`
+        : JAVASCRIPT_SYS_TEMPLATE;
+      const jsFuncsStr = this.functionTools
+        .filter((tool) => tool.callable)
+        .map((tool) => tool.description)
+        .join("\n\n");
+
+      let prompt = thePrompt.replace(
+        JS_FUNC_MARKER,
+        isEmpty(jsFuncsStr)
+          ? ""
+          : `* The following functions are available in global context (already implemented):
 \`\`\`
 ${jsFuncsStr}
 \`\`\`
 `
-    );
+      );
 
-    const jsModulesStr = this.functionTools
-      .filter((tool) => !tool.callable)
-      .flatMap((tool) => tool.deps)
-      .join(",");
-    return prompt.replace(
-      JS_MODULE_MARKER,
-      isEmpty(jsModulesStr) ? "" : `* Available dependency modules in context: ${jsModulesStr}`
-    );
+      const jsModulesStr = this.functionTools
+        .filter((tool) => !tool.callable)
+        .flatMap((tool) => tool.deps)
+        .join(",");
+
+      this.interpreterPrompt = prompt.replace(
+        JS_MODULE_MARKER,
+        isEmpty(jsModulesStr)
+          ? ""
+          : `* Available dependency modules in context: ${jsModulesStr}`
+      );
+    }
+
+    return this.interpreterPrompt;
   }
 
   provideFunctionTool(...funcTools: SkillFunction<unknown>[]): JavaScriptInterpreter {

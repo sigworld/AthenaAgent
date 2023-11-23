@@ -10,7 +10,10 @@ You can use these skills to help solve problems directly without explaination, o
 `;
 
 export default class BaseInterpreter extends DumbInterpreter {
-  sysPrompt(): string {
-    return SYS_PROMPT_TEMPLATE;
+  sysPrompt(customPrompt?: string): string {
+    if (customPrompt || !this.interpreterPrompt) {
+      this.interpreterPrompt = customPrompt || SYS_PROMPT_TEMPLATE;
+    }
+    return this.interpreterPrompt;
   }
 }

@@ -1,6 +1,8 @@
 
 **AthenaAgent** is a TypeScript port of **[GeneralAgent](https://github.com/CosmosShadow/GeneralAgent)** by *[CosmosShadow](https://github.com/CosmosShadow)*.
 
+<img src="https://img.shields.io/static/v1?label=license&message=MIT&color=white&style=flat" alt="License"/> [![Test Coverage](https://github.com/sigworld/AthenaAgent/actions/workflows/test-coverage.yml/badge.svg?branch=main)](https://github.com/sigworld/AthenaAgent/actions/workflows/test-coverage.yml)
+
 Refer to [GeneralAgent README](https://github.com/CosmosShadow/GeneralAgent/blob/main/README.md) for more details about the agent framework.
 
 

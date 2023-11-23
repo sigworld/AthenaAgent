@@ -1,12 +1,13 @@
 import { isNilEmpty, notNilEmpty } from "../util/puref";
 
 export default abstract class DumbInterpreter implements Interpreter {
+  protected interpreterPrompt: string;
   protected inputMatchPattern = "";
   protected outputMatchPattern = "";
   protected outputMatchStartWithPattern = "";
 
-  sysPrompt(): string {
-    return "";
+  sysPrompt(customPrompt?: string): string {
+    return customPrompt || "";
   }
 
   inputMatches(input: string): boolean {

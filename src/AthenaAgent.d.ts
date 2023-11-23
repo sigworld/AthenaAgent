@@ -3,7 +3,7 @@ type AnyFunction =
   | ((...args: unknown[]) => Promise<unknown>);
 
 interface Interpreter {
-  sysPrompt(): string;
+  sysPrompt(customPrompt?: string): string;
   inputMatches(input: string): boolean;
   outputMatches(output: string): boolean;
   outputStartMatches(output: string): [matches: boolean, matchedStr: string];
