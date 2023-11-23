@@ -30,7 +30,7 @@ type LLMInferenceConfig = {
   requireJson?: boolean;
 };
 
-type LLMType = "GPT3_5" | "GPT4";
+type LLMType = "GPT3_5" | "GPT4" | "GPT4_T";
 
 type LLMInstructType = "GPT3_5_I"; // GPT3.5-Instruct
 

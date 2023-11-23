@@ -7,6 +7,11 @@ export const notNil = R.isNil;
 export const isNilEmpty = R.either(R.isNil, R.isEmpty);
 export const notNilEmpty = R.compose(R.not, isNilEmpty);
 
+export const sleep = (timeout: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), timeout);
+  });
+
 /// GPT related pure functions
 export const pickFirstCompletionChoice = R.path("choices.0.text");
 export const pickFirstChatCompletionChoice = R.path("choices.0.message.content");

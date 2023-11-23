@@ -6,7 +6,7 @@
 Refer to [GeneralAgent README](https://github.com/CosmosShadow/GeneralAgent/blob/main/README.md) for more details about the agent framework.
 
 
-## Features (Specific to AthenaAgent)
+## Features
 
 * Simple, fast, stable: compatible with Azure OpenAI models: GPT3.5-turbo, GPT4, GPT4-turbo
 * Build-in interpreters: JavaScript(built-in vm context)
@@ -31,12 +31,21 @@ This project is now under active 🔥 development with daily updates.
 yarn install
 ```
 
-Add the following environment variables before running `yarn test`:
+**The following environment variables are required for LLM infererence:**
 
 ```
-GPT3_5_APIKEY={AZURE_APIKEY}
-GPT3_5_URL={AZURE_ENDPOINT_URL}  #example: https://{azure-gpt-model-endpoint}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={azure-openai-api-version}
+# GPT4 (for LLM ChatCompletion inference), latest Azure api-version: 2023-12-01-preview
+GPT4_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
+GPT4_APIKEY={api-key}
 
-GPT4_APIKEY={AZURE_APIKEY}
-GPT4_URL={AZURE_ENDPOINT_URL}
+# GPT4-Turbo (for LLM ChatCompletion inference. It's not stable due to heavy traffic, not recommended. encountering too many empty responses), latest api-version: 2023-09-01-preview
+GPT4_T_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
+GPT4_T_APIKEY={api-key}
+
+# GPT3.5-Turbo (for LLM ChatCompletion inference), latest Azure api-version: 2023-12-01-preview
+GPT3_5_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
+GPT3_5_APIKEY={api-key}
+
+# GPT3.5-Turbo-Instruct (for LLM Completion inference), latest Azure api-version: 2023-09-01-preview
+GPT3_5_I_APIKEY={api-key}
 ```
