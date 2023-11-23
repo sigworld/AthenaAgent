@@ -3,8 +3,8 @@ import SkillSet from "../skill/SkillSet";
 import { logOf } from "../util/logger";
 import {
   isNilEmpty,
-  pickFirstCompletionChoice,
-  pickFirstCompletionStreamChoice
+  pickFirstChatCompletionChoice,
+  pickFirstChatCompletionStreamChoice
 } from "../util/puref";
 import DumbAgent from "./DumbAgent";
 
@@ -71,8 +71,12 @@ export default class NormalAgent extends DumbAgent {
     let parsingInterpreter: Interpreter;
     let interpreterParsingStage = 0;
     const cachedTokens: string[] = [];
-    for await (const deltaResponse of SkillSet.fetchLLMCompletion(this.model, messages, true)) {
-      const token = pickFirstCompletionStreamChoice(deltaResponse) as string;
+    for await (const deltaResponse of SkillSet.fetchLLMChatCompletion(
+      this.model,
+      messages,
+      true
+    )) {
+      const token = pickFirstChatCompletionStreamChoice(deltaResponse) as string;
       if (isNilEmpty(token)) continue; // for azure openai api, first streamed message is role: assistant
 
       result += token;
@@ -155,12 +159,14 @@ export default class NormalAgent extends DumbAgent {
     let result = "";
 
     let interpreterParsingStage = 0;
-    for await (const deltaResponse of SkillSet.fetchLLMCompletion(
+    // TODO: when messages include assistant message, next to do is use completion api
+    // SkillSet.fetchLLMCompletion(this.model);
+    for await (const deltaResponse of SkillSet.fetchLLMChatCompletion(
       this.model,
       messages,
       false
     )) {
-      result = pickFirstCompletionChoice(deltaResponse) as string;
+      result = pickFirstChatCompletionChoice(deltaResponse) as string;
       if (isNilEmpty(result)) {
         logger.warn("something's wrong, api responded nothing!");
         return interpreterParsingStage > 0;

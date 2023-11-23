@@ -32,6 +32,8 @@ type LLMInferenceConfig = {
 
 type LLMType = "GPT3_5" | "GPT4";
 
+type LLMInstructType = "GPT3_5_I"; // GPT3.5-Instruct
+
 type LLMConfig = {
   url: string;
   apiKey: string;
@@ -40,3 +42,5 @@ type LLMConfig = {
 type ConversationRole = "user" | "assistant" | "system";
 
 type ConversationMessage = { role: ConversationRole; content: string };
+
+type PromptMessage = string | string[];
