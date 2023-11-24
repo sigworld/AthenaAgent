@@ -81,24 +81,30 @@ export async function* fetchLLMCompletion(
 export async function* fetchLLMChatCompletion(
   model: LLMType,
   prompt: ConversationMessage[],
-  stream: boolean = true
+  stream: boolean = true,
+  jsonMode: boolean = false
 ) {
   const modelConfig = getLLMConfig(model);
-  const request = needle.post(
-    modelConfig.url,
-    {
-      messages: prompt,
-      stream,
-      top_p: 0.2
+
+  const requestBody = {
+    messages: prompt,
+    stream,
+    top_p: 0.2
+  };
+
+  if (model === "GPT4_T" || model === "GPT3_5_T") {
+    Object.assign(requestBody, {
+      response_format: { type: jsonMode ? "json_object" : "text" }
+    });
+  }
+
+  const request = needle.post(modelConfig.url, requestBody, {
+    json: true,
+    headers: {
+      "api-key": modelConfig.apiKey
     },
-    {
-      json: true,
-      headers: {
-        "api-key": modelConfig.apiKey
-      },
-      content_type: "application/json"
-    }
-  );
+    content_type: "application/json"
+  });
   const DATA_MARKER = "data: ";
   const DONE_MARKER = "[DONE]";
   const NORMAL_FINISH_MARKER = "stop";

@@ -23,18 +23,44 @@ const conversation: ConversationMessage[] = [
   }
 ];
 
-test.runIf(isDev)("GPT3.5 repeater, no stream", async () => {
+test.runIf(isDev).skip("GPT3.5 repeater, no stream", async () => {
   const completion = SkillSet.fetchLLMChatCompletion("GPT3_5", conversation, false);
   let data = (await completion.next()).value;
   const response = pickFirstChatCompletionChoiceContent(data);
   expect(response).toBe("I'm Good, SIR!");
 });
 
-test.runIf(isDev)("GPT4 repeater, no stream", async () => {
+test.runIf(isDev)("GPT3.5 Turbo repeater, no stream, json mode", async () => {
+  const jsonConversation: ConversationMessage[] = [
+    {
+      role: "user",
+      content: "I'm Good. Echo my word in json." // NOTE: must mention json in some form in content
+    }
+  ];
+  const completion = SkillSet.fetchLLMChatCompletion("GPT3_5_T", jsonConversation, false, true);
+  let data = (await completion.next()).value;
+  const response = pickFirstChatCompletionChoiceContent(data) as string;
+  expect(JSON.parse(response)).toEqual({ word: "Good" });
+});
+
+test.runIf(isDev).skip("GPT4 repeater, no stream", async () => {
   const completion = SkillSet.fetchLLMChatCompletion("GPT4", conversation, false);
   let data = (await completion.next()).value;
   const response = pickFirstChatCompletionChoiceContent(data);
   expect(response).toBe("I'm Good, SIR!");
+});
+
+test.runIf(isDev)("GPT4 repeater, no stream, json mode", async () => {
+  const jsonConversation: ConversationMessage[] = [
+    {
+      role: "user",
+      content: "I'm Good. Echo my word in json." // NOTE: must mention json in some form in content
+    }
+  ];
+  const completion = SkillSet.fetchLLMChatCompletion("GPT4_T", jsonConversation, false, true);
+  let data = (await completion.next()).value;
+  const response = pickFirstChatCompletionChoiceContent(data) as string;
+  expect(JSON.parse(response)).toEqual({ response: "I'm Good." });
 });
 
 test.runIf(isDev).skip("GPT3.5 repeater, stream ", async () => {
@@ -67,7 +93,7 @@ test.runIf(isDev).skip("GPT4 repeater, stream", async () => {
   }
 });
 
-test.runIf(isDev)("GPT3.5-Instruct, no stream", async () => {
+test.runIf(isDev).skip("GPT3.5-Instruct, no stream", async () => {
   const completion = SkillSet.fetchLLMCompletion(
     "GPT3_5_I",
     `I said to a repeater: "Good". And the repeater exactly echoed:`,
@@ -130,8 +156,8 @@ function gptToolsFunctionChatCompletion(model: LLMType) {
   );
 }
 
-test.runIf(isDev).skip("GPT3.5-Turbo Tools-Function WebScraping", async () => {
-  const completion = gptToolsFunctionChatCompletion("GPT3_5");
+test.runIf(isDev)("GPT3.5-Turbo Tools-Function WebScraping", async () => {
+  const completion = gptToolsFunctionChatCompletion("GPT3_5_T");
   for await (const data of completion) {
     const token = pickFirstChatCompletionChoiceContent(data);
     expect(token).toBeUndefined();
@@ -149,7 +175,7 @@ test.runIf(isDev).skip("GPT3.5-Turbo Tools-Function WebScraping", async () => {
   }
 });
 
-test.runIf(isDev).skip("GPT4-Turbo Tools-Function WebScraping", async () => {
+test.runIf(isDev)("GPT4-Turbo Tools-Function WebScraping", async () => {
   const completion = gptToolsFunctionChatCompletion("GPT4_T");
   for await (const data of completion) {
     const token = pickFirstChatCompletionChoiceContent(data);

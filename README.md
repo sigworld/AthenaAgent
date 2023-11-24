@@ -45,7 +45,8 @@ yarn install
 GPT4_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
 GPT4_APIKEY={api-key}
 
-# GPT4-Turbo (for LLM ChatCompletion inference. It's not stable due to heavy traffic, not recommended. encountering too many empty responses)
+# GPT4-Turbo, GPT4-1106-preview(for LLM ChatCompletion inference, supports json mode and reproducible output)
+# It's not stable due to heavy traffic, not recommended. encountering too many empty responses)
 GPT4_T_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
 GPT4_T_APIKEY={api-key}
 
@@ -56,4 +57,8 @@ GPT3_5_APIKEY={api-key}
 # GPT3.5-Turbo-Instruct (for LLM Completion inference)
 GPT3_5_I_APIKEY={api-key}
 GPT3_5_I_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/completions?api-version={api-version}
+
+# GPT3.5-Turbo-1106 (for LLM ChatCompletion inference, supports json mode and reproducible output)
+GPT3_5_T_APIKEY={api-key}
+GPT3_5_T_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
 ```
