@@ -40,19 +40,20 @@ yarn install
 **The following environment variables are required for LLM inferrence:**
 
 ```
-# GPT4 (for LLM ChatCompletion inference), latest Azure api-version: 2023-12-01-preview
+### reference: https://learn.microsoft.com/en-us/azure/ai-services/openai/reference
+# GPT4 (for LLM ChatCompletion inference
 GPT4_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
 GPT4_APIKEY={api-key}
 
-# GPT4-Turbo (for LLM ChatCompletion inference. It's not stable due to heavy traffic, not recommended. encountering too many empty responses), latest api-version: 2023-09-01-preview
+# GPT4-Turbo (for LLM ChatCompletion inference. It's not stable due to heavy traffic, not recommended. encountering too many empty responses)
 GPT4_T_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
 GPT4_T_APIKEY={api-key}
 
-# GPT3.5-Turbo (for LLM ChatCompletion inference), latest Azure api-version: 2023-12-01-preview
+# GPT3.5-Turbo (for LLM ChatCompletion inference)
 GPT3_5_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
 GPT3_5_APIKEY={api-key}
 
-# GPT3.5-Turbo-Instruct (for LLM Completion inference), latest Azure api-version: 2023-09-01-preview
+# GPT3.5-Turbo-Instruct (for LLM Completion inference)
 GPT3_5_I_APIKEY={api-key}
 GPT3_5_I_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/completions?api-version={api-version}
 ```
