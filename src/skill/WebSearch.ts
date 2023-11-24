@@ -1,5 +1,8 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { logOf } from "../util/logger";
+
+const logger = logOf("Skill-WebSearch");
 
 export const scrapeWeb: SkillFunction<{
   title: string;
@@ -20,6 +23,7 @@ export const scrapeWeb: SkillFunction<{
       .get();
     return { title, content, imageUrls, hyperlinks };
   } catch (error) {
+    logger.error("failed to scrape page %s: %s", url, error);
     return;
   }
 };

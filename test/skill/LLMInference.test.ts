@@ -1,10 +1,12 @@
 import { expect, test } from "vitest";
 import SkillSet from "../../src/skill/SkillSet";
 import {
-  pickFirstChatCompletionChoice,
+  pickFirstChatCompletionChoiceContent,
+  pickFirstChatCompletionChoiceTools,
   pickFirstChatCompletionStreamChoice,
   pickFirstChatCompletionStreamRole,
-  pickFirstCompletionChoice
+  pickFirstCompletionChoice,
+  prop
 } from "../../src/util/puref";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -24,14 +26,14 @@ const conversation: ConversationMessage[] = [
 test.runIf(isDev)("GPT3.5 repeater, no stream", async () => {
   const completion = SkillSet.fetchLLMChatCompletion("GPT3_5", conversation, false);
   let data = (await completion.next()).value;
-  const response = pickFirstChatCompletionChoice(data);
+  const response = pickFirstChatCompletionChoiceContent(data);
   expect(response).toBe("I'm Good, SIR!");
 });
 
 test.runIf(isDev)("GPT4 repeater, no stream", async () => {
   const completion = SkillSet.fetchLLMChatCompletion("GPT4", conversation, false);
   let data = (await completion.next()).value;
-  const response = pickFirstChatCompletionChoice(data);
+  const response = pickFirstChatCompletionChoiceContent(data);
   expect(response).toBe("I'm Good, SIR!");
 });
 
@@ -93,4 +95,52 @@ test.runIf(isDev).skip("GPT3.5-Instruct, stream", async () => {
     cacheTokens.push(token);
   }
   expect(cacheTokens.join("")).toContain("Good");
+});
+
+test("GPT4-Turbo Tools-Function WebScraping", async () => {
+  const functions: ChatCompletionTool[] = [
+    {
+      type: "function",
+      function: {
+        name: "scrapeWeb",
+        description: SkillSet.scrapeWeb.description,
+        parameters: {
+          type: "object",
+          properties: {
+            url: {
+              type: "string",
+              description: "url of target web page"
+            }
+          },
+          required: ["url"]
+        }
+      }
+    }
+  ];
+  const completion = SkillSet.fetchLLMChatCompletionWithTools(
+    "GPT4_T",
+    [
+      {
+        role: "user",
+        content: "what's the title of https://www.example.com and https://openai.com ?"
+      }
+    ],
+    functions
+  );
+
+  for await (const data of completion) {
+    const token = pickFirstChatCompletionChoiceContent(data);
+    expect(token).toBeUndefined();
+
+    const toolCalls = pickFirstChatCompletionChoiceTools(data) as ChatCompletionToolCall[];
+    const titles = [];
+    for (const {
+      function: { name: fname, arguments: fargs }
+    } of toolCalls) {
+      // @ts-ignore
+      const scrapeResult = await SkillSet[fname](prop("url", JSON.parse(fargs)));
+      titles.push(prop("title", scrapeResult));
+    }
+    expect(titles).toEqual(["Example Domain", "OpenAI"]);
+  }
 });

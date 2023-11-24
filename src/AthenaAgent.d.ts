@@ -39,8 +39,51 @@ type LLMConfig = {
   apiKey: string;
 };
 
-type ConversationRole = "user" | "assistant" | "system";
+type ConversationRole = "user" | "assistant" | "system" | "tool";
 
 type ConversationMessage = { role: ConversationRole; content: string };
 
 type PromptMessage = string | string[];
+
+/**
+ * Currently, only `function` is supported on Azure, OpenAI supports `code_interpreter`, `retrieval`, `
+ */
+type ChatCompletionToolType = "function";
+
+/**
+ * @reference https://github.com/Azure/azure-rest-api-specs/blob/main/specification/cognitiveservices/data-plane/AzureOpenAI/inference/preview/2023-12-01-preview/inference.json
+ */
+type ChatCompletionTool = {
+  /**
+   * The type of the tool.
+   */
+  type: ChatCompletionToolType;
+
+  function: {
+    /**
+     * The name of the function to be called. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64."
+     */
+    name: string;
+
+    /**
+     * The description of what the function does.
+     */
+    description: string;
+
+    /**
+     * The parameters the functions accepts, described as a JSON Schema object.
+     */
+    parameters: JSONSchema7;
+  };
+};
+
+type ChatCompletionToolChoice = "none" | "auto";
+
+type ChatCompletionToolCall = {
+  function: {
+    name: string;
+    arguments: string;
+  };
+  id: string;
+  type: ChatCompletionToolType;
+};

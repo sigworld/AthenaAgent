@@ -143,3 +143,34 @@ export async function* fetchLLMChatCompletion(
     }
   }
 }
+
+export async function* fetchLLMChatCompletionWithTools(
+  model: LLMType,
+  prompt: ConversationMessage[],
+  tools: ChatCompletionTool[],
+  toolChoice: ChatCompletionToolChoice = "auto"
+) {
+  const modelConfig = getLLMConfig(model);
+  const request = needle.post(
+    modelConfig.url,
+    {
+      messages: prompt,
+      top_p: 0.2,
+      tools,
+      tool_choice: toolChoice
+    },
+    {
+      json: true,
+      headers: {
+        "api-key": modelConfig.apiKey
+      },
+      content_type: "application/json"
+    }
+  );
+
+  for await (const chunk of request) {
+    /* non-stream mode waits for only one complete chunk */
+    yield chunk;
+    break;
+  }
+}

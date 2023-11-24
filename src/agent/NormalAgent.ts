@@ -4,7 +4,7 @@ import { logOf } from "../util/logger";
 import {
   isNilEmpty,
   notEmpty,
-  pickFirstChatCompletionChoice,
+  pickFirstChatCompletionChoiceContent,
   pickFirstChatCompletionStreamChoice,
   sleep
 } from "../util/puref";
@@ -188,7 +188,7 @@ export default class NormalAgent extends DumbAgent {
         messages,
         false
       )) {
-        result = pickFirstChatCompletionChoice(deltaResponse) as string;
+        result = pickFirstChatCompletionChoiceContent(deltaResponse) as string;
         if (isNilEmpty(result)) {
           logger.warn("something's wrong, api responded nothing!");
           return interpreterParsingStage > 0;

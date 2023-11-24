@@ -6,6 +6,7 @@ export const isNil = R.isNil;
 export const notNil = R.isNil;
 export const isNilEmpty = R.either(R.isNil, R.isEmpty);
 export const notNilEmpty = R.compose(R.not, isNilEmpty);
+export const prop = R.prop;
 
 export const sleep = (timeout: number) =>
   new Promise<void>((resolve) => {
@@ -14,7 +15,8 @@ export const sleep = (timeout: number) =>
 
 /// GPT related pure functions
 export const pickFirstCompletionChoice = R.path("choices.0.text");
-export const pickFirstChatCompletionChoice = R.path("choices.0.message.content");
+export const pickFirstChatCompletionChoiceTools = R.path("choices.0.message.tool_calls");
+export const pickFirstChatCompletionChoiceContent = R.path("choices.0.message.content");
 export const pickFirstChatCompletionStreamChoice = R.path("choices.0.delta.content");
 export const pickFirstFinishReason = R.path("choices.0.finish_reason");
 export const pickFirstChatCompletionStreamRole = R.path("choices.0.delta.role");
