@@ -97,7 +97,7 @@ test.runIf(isDev).skip("GPT3.5-Instruct, stream", async () => {
   expect(cacheTokens.join("")).toContain("Good");
 });
 
-test("GPT4-Turbo Tools-Function WebScraping", async () => {
+function gptToolsFunctionChatCompletion(model: LLMType) {
   const functions: ChatCompletionTool[] = [
     {
       type: "function",
@@ -117,8 +117,9 @@ test("GPT4-Turbo Tools-Function WebScraping", async () => {
       }
     }
   ];
-  const completion = SkillSet.fetchLLMChatCompletionWithTools(
-    "GPT4_T",
+
+  return SkillSet.fetchLLMChatCompletionWithTools(
+    model,
     [
       {
         role: "user",
@@ -127,7 +128,29 @@ test("GPT4-Turbo Tools-Function WebScraping", async () => {
     ],
     functions
   );
+}
 
+test.runIf(isDev).skip("GPT3.5-Turbo Tools-Function WebScraping", async () => {
+  const completion = gptToolsFunctionChatCompletion("GPT3_5");
+  for await (const data of completion) {
+    const token = pickFirstChatCompletionChoiceContent(data);
+    expect(token).toBeUndefined();
+
+    const toolCalls = pickFirstChatCompletionChoiceTools(data) as ChatCompletionToolCall[];
+    const titles = [];
+    for (const {
+      function: { name: fname, arguments: fargs }
+    } of toolCalls) {
+      // @ts-ignore
+      const scrapeResult = await SkillSet[fname](prop("url", JSON.parse(fargs)));
+      titles.push(prop("title", scrapeResult));
+    }
+    expect(titles).toEqual(["Example Domain", "OpenAI"]);
+  }
+});
+
+test.runIf(isDev).skip("GPT4-Turbo Tools-Function WebScraping", async () => {
+  const completion = gptToolsFunctionChatCompletion("GPT4_T");
   for await (const data of completion) {
     const token = pickFirstChatCompletionChoiceContent(data);
     expect(token).toBeUndefined();

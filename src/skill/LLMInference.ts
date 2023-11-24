@@ -158,6 +158,7 @@ export async function* fetchLLMChatCompletionWithTools(
       top_p: 0.2,
       tools,
       tool_choice: toolChoice
+      // stream: true // TODO: support stream tool_call of functions when needed
     },
     {
       json: true,
