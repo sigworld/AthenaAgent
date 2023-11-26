@@ -183,6 +183,19 @@ export async function* fetchLLMChatCompletionWithTools(
   }
 }
 
+/**
+ * fetches the LLM Embedding of the provided input.
+ *
+ * @async
+ * @export
+ * @param {string | string[]} input - The input information to get the LLM Embedding.
+ *  It can be either a single string or an array of strings.
+ *  The maximum length of input text for latest embedding models is 8192 tokens.
+ *  Verify that inputs don't exceed this limit before making a request.
+ * @reference https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/embeddings?tabs=console#verify-inputs-dont-exceed-the-maximum-length
+ * @returns {Promise<number[][] | undefined>} A promise that resolves to the LLM Embedding as a 2D number array.
+ *  If there are any issues in fetching, it would resolve to undefined.
+ */
 export async function fetchLLMEmbedding(
   input: string | string[]
 ): Promise<number[][] | undefined> {
