@@ -19,6 +19,9 @@ interface SkillFunction<T> {
   description?: string;
 }
 
+type FileIOSupportedFileTypes = "TEXT";
+type FileIOFileWriteMode = "overwrite" | "append";
+
 interface TokenAggregator {
   more(res: unknown): void;
   get(): unknown;
@@ -33,6 +36,8 @@ type LLMInferenceConfig = {
 type LLMType = "GPT3_5" | "GPT3_5_T" | "GPT4" | "GPT4_T";
 
 type LLMInstructType = "GPT3_5_I"; // GPT3.5-Instruct
+
+type LLMEmbeddingType = "ADA2"; // text-embedding-ada-002
 
 type LLMConfig = {
   url: string;

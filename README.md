@@ -19,7 +19,6 @@ Refer to [GeneralAgent/README](https://github.com/CosmosShadow/GeneralAgent/blob
 
 ### Coming Soon
 
-- `functions` and `json_mode` support for more stable and consistent response
 - Interpreters: File, Shell, AppleScript, Retrieve Embedding, etc.
 - Skill Set: txt-to-img(DALLE-3), txt-to-voice
 - Memory: File Memory, Compressed Memory, Link Memory, etc.
@@ -61,4 +60,8 @@ GPT3_5_I_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deploy
 # GPT3.5-Turbo-1106 (for LLM ChatCompletion inference, supports json mode and reproducible output)
 GPT3_5_T_APIKEY={api-key}
 GPT3_5_T_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version={api-version}
+
+# Ada002 (for Embedding, the one and only embedding model supported by Azure OpenAI)
+ADA2_APIKEY={api-key}
+ADA2_URL=https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/embeddings?api-version={api-version}
 ```

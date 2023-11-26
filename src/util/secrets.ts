@@ -11,7 +11,9 @@ if (fs.existsSync(".env")) {
   logger.warn("No .env file provided, fallback to platform configurations!");
 }
 
-export const getLLMConfig = (model: LLMType | LLMInstructType): LLMConfig => {
+export const getLLMConfig = (
+  model: LLMType | LLMInstructType | LLMEmbeddingType
+): LLMConfig => {
   return {
     url: process.env[`${model}_URL`],
     apiKey: process.env[`${model}_APIKEY`]

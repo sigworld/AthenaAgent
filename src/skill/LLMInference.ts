@@ -4,6 +4,7 @@ import {
   isCompletionChoiceEmpty,
   notEmpty,
   notNilEmpty,
+  pickEmbeddingData,
   pickFirstFinishReason
 } from "../util/puref";
 import { getLLMConfig } from "../util/secrets";
@@ -179,5 +180,31 @@ export async function* fetchLLMChatCompletionWithTools(
     /* non-stream mode waits for only one complete chunk */
     yield chunk;
     break;
+  }
+}
+
+export async function fetchLLMEmbedding(
+  input: string | string[]
+): Promise<number[][] | undefined> {
+  const modelConfig = getLLMConfig("ADA2");
+  const response = await needle(
+    "post",
+    modelConfig.url,
+    {
+      input
+    },
+    {
+      json: true,
+      headers: {
+        "api-key": modelConfig.apiKey
+      },
+      content_type: "application/json"
+    }
+  );
+  if (response.statusCode === 200) {
+    return pickEmbeddingData(response.body);
+  } else {
+    logger.error("failed to get embedding: [%s]%s", response.statusCode, response.body);
+    return;
   }
 }
