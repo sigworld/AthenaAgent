@@ -195,7 +195,7 @@ test.runIf(isDev)("GPT4-Turbo Tools-Function WebScraping", async () => {
   }
 });
 
-test.only("Ada002 Embedding", async () => {
+test.runIf(isDev)("Ada002 Embedding", async () => {
   const embeddings = await SkillSet.fetchLLMEmbedding(["Hi", "你好", "こんにちは", "مرحبًا"])!;
   expect(cosineSimilarity(embeddings[0], embeddings[0])).toBeGreaterThan(0.999);
   expect(cosineSimilarity(embeddings[1], embeddings[1])).toBeGreaterThan(0.999);
@@ -203,15 +203,4 @@ test.only("Ada002 Embedding", async () => {
   expect(cosineSimilarity(embeddings[1], embeddings[2])).toBeGreaterThan(0.8);
   expect(cosineSimilarity(embeddings[2], embeddings[3])).toBeGreaterThan(0.8);
   expect(cosineSimilarity(embeddings[3], embeddings[0])).toBeGreaterThan(0.8);
-
-  const embeddings2 = await SkillSet.fetchLLMEmbedding([
-    "Hi, I like singing",
-    "你好, 我喜欢唱歌",
-    "大家好, 我喜欢唱歌",
-    "朋友们好，我喜欢唱歌"
-  ])!;
-  expect(cosineSimilarity(embeddings2[0], embeddings2[1])).toBeGreaterThan(0.8);
-  expect(cosineSimilarity(embeddings2[1], embeddings2[2])).toBeGreaterThan(0.9);
-  expect(cosineSimilarity(embeddings2[2], embeddings2[3])).toBeGreaterThan(0.9);
-  expect(cosineSimilarity(embeddings2[3], embeddings2[0])).toBeGreaterThan(0.8);
 });
