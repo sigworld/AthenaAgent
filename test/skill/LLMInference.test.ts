@@ -2,6 +2,10 @@ import { expect, test } from "vitest";
 import SkillSet from "../../src/skill/SkillSet";
 import {
   cosineSimilarity,
+  selectTopKWithCosine,
+  selectTopKWithEuclidean
+} from "../../src/util/embedding";
+import {
   pickFirstChatCompletionChoiceContent,
   pickFirstChatCompletionChoiceTools,
   pickFirstChatCompletionStreamChoice,
@@ -203,4 +207,38 @@ test.runIf(isDev)("Ada002 Embedding", async () => {
   expect(cosineSimilarity(embeddings[1], embeddings[2])).toBeGreaterThan(0.8);
   expect(cosineSimilarity(embeddings[2], embeddings[3])).toBeGreaterThan(0.8);
   expect(cosineSimilarity(embeddings[3], embeddings[0])).toBeGreaterThan(0.8);
+});
+
+test("Ada002 Embedding and TopK Retrieval using Cosine Similarity", async () => {
+  const sources = [
+    "It is a lovely dog",
+    "That is a very happy person",
+    "Today is a sunny day",
+    "他是个幸福的人",
+    "那个人很开心"
+  ];
+  const embeddings = await SkillSet.fetchLLMEmbedding(sources)!;
+  const query = await SkillSet.fetchLLMEmbedding("That is a happy person");
+  const similarTexts = selectTopKWithCosine(query[0], embeddings, 2, 0.7).map(
+    ([index]) => sources[index]
+  );
+  expect(similarTexts).toEqual(["That is a very happy person", "那个人很开心"]);
+});
+
+// with Ada002 Embedding, I still haven't found any scenario that could tell Cosine Similarity from Euclidean Distance
+test("Ada002 Embedding and TopK Retrieval using Euclidean Distance", async () => {
+  const sources = [
+    "Driver arrested after woman fell out of car and was seriously injured in Etobicoke, police say",
+    "Henry Kissinger, polarizing statesman who shaped U.S. foreign policy in Vietnam War era, dead at 100",
+    "Firearms ban amendments about votes, not safety, say P.E.I. gun owners", // selected as top 2
+    "Man killed in Langside rooming-house shooting had 'the biggest heart,' sister says",
+    "Non-profit offers free Starlink internet to Ulukhaktok; residents say they're good",
+    "Canada needs sophisticated discussion on firearm ban, says gun magazine editor", // selected as top 1
+    "Polytechnique mass shooting survivor slams gun rights group for using 'POLY' promo code"
+  ];
+  const embeddings = await SkillSet.fetchLLMEmbedding(sources)!;
+  const query = await SkillSet.fetchLLMEmbedding("headlines criticizing gun control laws");
+  const similarTextsEuclidean = selectTopKWithEuclidean(query[0], embeddings, 2);
+  const similarTextsCosine = selectTopKWithCosine(query[0], embeddings, 2);
+  expect(similarTextsEuclidean).toEqual(similarTextsCosine);
 });

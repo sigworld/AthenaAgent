@@ -1,5 +1,14 @@
 import { expect, test } from "vitest";
-import { splitTextIntoParagraphs, splitTextIntoSentences } from "../../src/util/embedding";
+import {
+  euclideanDistance,
+  splitTextIntoParagraphs,
+  splitTextIntoSentences
+} from "../../src/util/embedding";
+
+test("euclidean distance", () => {
+  expect(euclideanDistance([1, 0], [0, 1])).toBe(Math.sqrt(2));
+  expect(euclideanDistance([1, 0], [1, 1])).toBe(1);
+});
 
 test("split paragraph", () => {
   const splits = splitTextIntoParagraphs(
