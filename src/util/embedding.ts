@@ -3,6 +3,7 @@ import {
   ascendCompareFn,
   decendCompareFn as descendCompareFn,
   isNilEmpty,
+  max,
   notNilEmpty
 } from "./puref";
 
@@ -108,14 +109,14 @@ export const selectTopKWithEuclidean = (
   queryVector: number[],
   embeddingVectors: number[][],
   selectTopCounter: number,
-  mostSimilar: boolean = true
+  closerFirst: boolean = true
 ): [index: number, similarity: number][] => {
   const topKEmbeddings: [number, number][] = embeddingVectors.map((embedding, i) => [
     euclideanDistance(embedding, queryVector),
     i
   ]);
   return topKEmbeddings
-    .sort(([a], [b]) => (mostSimilar ? ascendCompareFn(a, b) : descendCompareFn(a, b)))
+    .sort(([a], [b]) => (closerFirst ? ascendCompareFn(a, b) : descendCompareFn(a, b)))
     .slice(0, selectTopCounter)
     .map(([v, i]) => [i, v]);
 };
@@ -123,8 +124,36 @@ export const selectTopKWithEuclidean = (
 /**
  *
  */
-export const selectTopKMMR = (
+export const selectTopKMMRWithCosine = (
   queryVector: number[],
   embeddingVectors: number[][],
-  selectTopCounter: number
-) => {};
+  selectTopCounter: number,
+  threshold: number = 0.5
+) => {
+  const simVals: [number, number][] = embeddingVectors.map((embedding, i) => [
+    cosineSimilarity(embedding, queryVector),
+    i
+  ]);
+  const selected: number[] = [];
+  while (selected.length < selectTopCounter) {
+    const mmrScores: [number, number][] = [];
+    for (const [simVal, i] of simVals) {
+      if (!selected.includes(i)) {
+        let maxSimInSelected = 0;
+        for (let j = 0; j < selected.length; j++) {
+          const embedSimV = cosineSimilarity(embeddingVectors[j], embeddingVectors[i]);
+          maxSimInSelected = max(embedSimV, maxSimInSelected);
+          const mmrScore = threshold * simVal - (1 - threshold) * embedSimV;
+          mmrScores.push([mmrScore, i]);
+        }
+      }
+    }
+    // reduce(
+    //   maxBy(([score]) => score),
+    //   0,
+    //   mmrScores
+    // );
+    // selected.push();
+  }
+  // TODO:
+};
