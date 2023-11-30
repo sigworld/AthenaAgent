@@ -9,7 +9,8 @@ export const notNilEmpty = R.compose(R.not, isNilEmpty);
 export const max = R.max;
 export const maxBy = R.maxBy;
 export const prop = R.prop;
-export const reduce = R.reduce;
+export const equals = R.equals;
+export const nth = R.nth;
 export const ascendCompareFn = (a: number, b: number) => a - b;
 export const decendCompareFn = (a: number, b: number) => b - a;
 

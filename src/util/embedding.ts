@@ -4,6 +4,7 @@ import {
   decendCompareFn as descendCompareFn,
   isNilEmpty,
   max,
+  maxBy,
   notNilEmpty
 } from "./puref";
 
@@ -122,7 +123,8 @@ export const selectTopKWithEuclidean = (
 };
 
 /**
- *
+ * provide more balance between relevance and diversity in information retrieval
+ * @param threshold [0, 1], ~1 means more relevance and ~0 stresses more diversity
  */
 export const selectTopKMMRWithCosine = (
   queryVector: number[],
@@ -134,26 +136,28 @@ export const selectTopKMMRWithCosine = (
     cosineSimilarity(embedding, queryVector),
     i
   ]);
-  const selected: number[] = [];
+  const selected: [score: number, index: number][] = [];
   while (selected.length < selectTopCounter) {
     const mmrScores: [number, number][] = [];
+    const selectedIndexes = selected.map(([_, idx]) => idx);
     for (const [simVal, i] of simVals) {
-      if (!selected.includes(i)) {
+      if (!selectedIndexes.includes(i)) {
         let maxSimInSelected = 0;
-        for (let j = 0; j < selected.length; j++) {
-          const embedSimV = cosineSimilarity(embeddingVectors[j], embeddingVectors[i]);
+        for (const [_, selectedIdx] of selected) {
+          const embedSimV = cosineSimilarity(
+            embeddingVectors[selectedIdx],
+            embeddingVectors[i]
+          );
           maxSimInSelected = max(embedSimV, maxSimInSelected);
-          const mmrScore = threshold * simVal - (1 - threshold) * embedSimV;
-          mmrScores.push([mmrScore, i]);
         }
+        const mmrScore = threshold * simVal - (1 - threshold) * maxSimInSelected;
+        mmrScores.push([mmrScore, i]);
       }
     }
-    // reduce(
-    //   maxBy(([score]) => score),
-    //   0,
-    //   mmrScores
-    // );
-    // selected.push();
+    const maxEntry = mmrScores.reduceRight((prev, current) =>
+      maxBy(([score]) => score, prev, current)
+    );
+    selected.push(maxEntry);
   }
-  // TODO:
+  return selected;
 };
