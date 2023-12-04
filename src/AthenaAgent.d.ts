@@ -92,3 +92,30 @@ type ChatCompletionToolCall = {
   id: string;
   type: ChatCompletionToolType;
 };
+
+type EmbeddingDocument = {
+  title: string;
+  metadata: Record<string, unknown>;
+  createtime: number;
+  embeddings?: {
+    hashes: string[];
+    texts: string[];
+    vectors: number[][];
+    indexes: AugmentedDocumentIndex[];
+  };
+};
+
+type AugmentedDocumentIndex = {
+  prev: number[]; // indexes of prepending text
+  next: number[]; // indexes of appending text
+  similar: number[]; // indexes of similar text
+};
+
+type AugmentedEmbeddingText = {
+  text: string;
+  augmentedTexts?: {
+    prev: string[];
+    next: string[];
+    similar: string[];
+  };
+};

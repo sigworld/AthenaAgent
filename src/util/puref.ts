@@ -11,6 +11,8 @@ export const maxBy = R.maxBy;
 export const prop = R.prop;
 export const equals = R.equals;
 export const nth = R.nth;
+export const has = R.has;
+export const mergeLeft = R.mergeLeft;
 export const ascendCompareFn = (a: number, b: number) => a - b;
 export const decendCompareFn = (a: number, b: number) => b - a;
 

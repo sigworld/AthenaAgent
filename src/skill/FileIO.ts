@@ -35,6 +35,7 @@ const getFileType = (filePath: string): FileIOSupportedFileTypes => {
     }
 
     case "TXT":
+    case "JSON":
       return "TEXT";
     default:
       throw new Error(`unknown file type ${matchArr[1]} not supported yet`);

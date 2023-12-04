@@ -54,6 +54,7 @@ const sentenceTokenizer = (text: string) => {
 
 export const splitTextIntoSentences = (text: string) => {
   const sentenceSplits = sentenceTokenizer(text).map((x) => x.trim());
+  // TODO: merge sentences that are too short
   return sentenceSplits;
 };
 
