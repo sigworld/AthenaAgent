@@ -1,4 +1,4 @@
-export default class CacheMemory {
+export default class CacheMemory implements AgentMemory {
   private messages: [ConversationMessage?] = [];
   constructor() {}
 

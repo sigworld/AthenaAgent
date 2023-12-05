@@ -44,6 +44,12 @@ type LLMConfig = {
   apiKey: string;
 };
 
+interface AgentMemory {
+  addMessage(role: ConversationRole, content: string): void;
+  appendMessage(role: ConversationRole, content: string): void;
+  getAllMessage(): ConversationMessage[];
+}
+
 type ConversationRole = "user" | "assistant" | "system" | "tool";
 
 type ConversationMessage = { role: ConversationRole; content: string };

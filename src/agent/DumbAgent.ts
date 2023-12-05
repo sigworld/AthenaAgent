@@ -1,8 +1,6 @@
-import CacheMemory from "../memory/CacheMemory";
-
 export default abstract class DumbAgent {
   private continueYourWork = false;
-  protected memory: CacheMemory;
+  protected memory: AgentMemory;
   protected interpreters: Interpreter[];
   protected shouldHideInternalInference = true;
   protected streamResponse = true;
