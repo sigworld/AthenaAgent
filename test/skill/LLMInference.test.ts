@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import { readFileContent } from "../../src/skill/FileIO";
 import SkillSet from "../../src/skill/SkillSet";
 import {
   cosineSimilarity,
@@ -272,3 +273,46 @@ test("Ada002 Embedding with TopKMMR Retrieval", async () => {
     expect(selected.map(nth(1))).toEqual([5, 1, 3]);
   }
 });
+
+test.skip("Split Text to Semantic Segment - Multiple Sentences", async () => {
+  const story = readFileContent("example/data/alice.txt");
+
+  // segments are sentences with proper length and complete semantic meanings.
+  const segments = [];
+  for await (const segment of SkillSet.splitTextIntoSemanticSegments(
+    "GPT3_5_T", // all models work, yet results are slightly different
+    {
+      input: story
+    },
+    true
+  )) {
+    segments.push(segment);
+  }
+}, 60000);
+
+test.skip("Split Text to Semantic Segment - Paragraphs", async () => {
+  const story = readFileContent("example/data/alice.txt");
+  // sencences are basically paragraphs
+  const segments = [];
+  for await (const segment of SkillSet.splitTextIntoSemanticSegments(
+    "GPT3_5_T", // all models work, and results are almost the same
+    {
+      input: story,
+      customPrompt: `
+Act as a text segmenting function which will cut a complete story into segments, following these guidelines:
+- Spot Natural Breaks: Identify pauses in narrative flow, such as scene changes, time jumps, or shifts in perspective. Use these breaks as natural points to segment the story.
+- Focus on Character Dynamics: Create a new segment whenever there's a significant shift in focus between characters or a notable change in a character’s situation, emotions, or thoughts.
+- Highlight Key Plot Developments: Segment the story at major plot points or events that significantly alter the direction or tone of the narrative.
+- Track Theme and Mood Shifts: Use changes in the story's theme or mood as cues for segmentation, ensuring each segment maintains thematic consistency.
+- Segment by Dialogue: Start a new segment with each new dialogue or when the speaker changes, especially if the dialogue introduces new information or shifts the story’s direction.
+- Balance Segment Lengths: Aim for segments that are long enough to be contextually meaningful but short enough to be distinct and digestible. Avoid overly lengthy or brief segments.
+- Maintain Consistency: Apply these guidelines consistently throughout the story to ensure each segment is coherent and the overall segmentation structure makes sense.
+
+Output format: {segment}\n{segment}.
+    `
+    },
+    true
+  )) {
+    segments.push(segment);
+  }
+}, 60000);

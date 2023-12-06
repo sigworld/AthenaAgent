@@ -2,9 +2,11 @@ import needle from "needle";
 import { logOf } from "../util/logger";
 import {
   isCompletionChoiceEmpty,
+  isNilEmpty,
   notEmpty,
   notNilEmpty,
   pickEmbeddingData,
+  pickFirstChatCompletionStreamChoice,
   pickFirstFinishReason
 } from "../util/puref";
 import { getLLMConfig } from "../util/secrets";
@@ -220,4 +222,47 @@ export async function fetchLLMEmbedding(
     logger.error("failed to get embedding: [%s]%s", response.statusCode, response.body);
     return;
   }
+}
+
+export async function* splitTextIntoSemanticSegments(
+  model: LLMType,
+  {
+    input,
+    customPrompt,
+    separator = "\n"
+  }: { input: string; customPrompt?: string; separator?: string },
+  stream: boolean = false
+) {
+  const completion = fetchLLMChatCompletion(
+    model,
+    [
+      {
+        role: "system",
+        content:
+          (customPrompt ||
+            `Split the following text into semantic segments, for embedding storage and search purpose. Make sure each segment has a standalone context. `) +
+          `Respond in the following format: segment${separator}segment`
+      },
+      {
+        role: "user",
+        content: input
+      }
+    ],
+    stream
+  );
+
+  let sentenceSegment = "";
+  for await (const delta of completion) {
+    const token = pickFirstChatCompletionStreamChoice(delta) as string;
+    if (isNilEmpty(token)) continue;
+
+    const splitIndex = token.indexOf(separator);
+    if (splitIndex > -1) {
+      yield sentenceSegment + token.slice(0, splitIndex);
+      sentenceSegment = "";
+    } else {
+      sentenceSegment += token;
+    }
+  }
+  if (notNilEmpty(sentenceSegment)) yield sentenceSegment;
 }
